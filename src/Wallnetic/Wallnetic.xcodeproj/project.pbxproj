@@ -157,6 +157,9 @@
 		FC8374937C392694F64FF066 /* PlaylistSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6473E99775C442DD49993FFA /* PlaylistSettingsView.swift */; };
 		FF16323D780FDC2A4404D5BA /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6272C35871A69060C41EFEC /* AIService.swift */; };
 		D1B6B8A23D3C34F39A0A13BE /* WebWallpaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9528FB7E57A8A2D5F910CB7E /* WebWallpaperTests.swift */; };
+		DD48C959F34C5133C1601A13 /* WebWallpaperDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE726F85D2536AF3670842C8 /* WebWallpaperDocument.swift */; };
+		7A2209E2AD7667E024A42ACD /* WebWallpaperEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FAA09265244AEA78CBFF99 /* WebWallpaperEngine.swift */; };
+		69B89274308FE2C08C124C72 /* WebWallpapersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD6DE214B66D2D9A22A2B23 /* WebWallpapersView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -348,6 +351,9 @@
 		FE414F5FC0D738D8D7593A2E /* GenerationHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerationHistory.swift; sourceTree = "<group>"; };
 		FFD329195A86A0398FB6B4D0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9528FB7E57A8A2D5F910CB7E /* WebWallpaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebWallpaperTests.swift; sourceTree = "<group>"; };
+		EE726F85D2536AF3670842C8 /* WebWallpaperDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebWallpaperDocument.swift; sourceTree = "<group>"; };
+		89FAA09265244AEA78CBFF99 /* WebWallpaperEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebWallpaperEngine.swift; sourceTree = "<group>"; };
+		2CD6DE214B66D2D9A22A2B23 /* WebWallpapersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebWallpapersView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -376,6 +382,7 @@
 		1BE37129FFCF799850FBB994 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				89FAA09265244AEA78CBFF99 /* WebWallpaperEngine.swift */,
 				C649839F5BB66D43BA4A499A /* AudioVisualizerOverlayController.swift */,
 				D726427A9199C4D93B9E93F2 /* DesktopOverlayController.swift */,
 				5EBFA2EC8B70298D0B7975E3 /* DesktopWindowController.swift */,
@@ -506,6 +513,7 @@
 		535A9501C7CEE862EAB25CF6 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				2CD6DE214B66D2D9A22A2B23 /* WebWallpapersView.swift */,
 				91B502C8C68ABF2CD503030E /* AIGenerateView.swift */,
 				3C858C83BC8D22A21A53D7BD /* AudioVisualizerOverlayView.swift */,
 				3791DDB3169C35687B40D5CA /* BrowserWebView.swift */,
@@ -543,6 +551,7 @@
 		6BE87A6F82CB3CA3F7C62588 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				EE726F85D2536AF3670842C8 /* WebWallpaperDocument.swift */,
 				B7021318E82664A8754F5FF1 /* AIProvider.swift */,
 				8B98ABE56A3B186B1C7AFA43 /* AIStyle.swift */,
 				FE414F5FC0D738D8D7593A2E /* GenerationHistory.swift */,
@@ -842,6 +851,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				69B89274308FE2C08C124C72 /* WebWallpapersView.swift in Sources */,
+				7A2209E2AD7667E024A42ACD /* WebWallpaperEngine.swift in Sources */,
+				DD48C959F34C5133C1601A13 /* WebWallpaperDocument.swift in Sources */,
 				9D898F865EED9BB751EBF7EF /* AIGenerateView.swift in Sources */,
 				8AAE56E8D08264474270D889 /* AIGenerateViewModel.swift in Sources */,
 				72F4CF08714A41746B6A0258 /* AIProvider.swift in Sources */,

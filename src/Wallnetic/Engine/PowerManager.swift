@@ -9,6 +9,8 @@ class PowerManager {
     // Callbacks
     var onShouldPausePlayback: (() -> Void)?
     var onShouldResumePlayback: (() -> Void)?
+    /// State changes also reach a renderer selected while already paused.
+    var onPowerConditionChanged: ((_ paused: Bool, _ mayResume: Bool) -> Void)?
 
     private let fullscreenQueue = DispatchQueue(label: "com.wallnetic.power.fullscreen", qos: .utility)
 
@@ -67,6 +69,7 @@ class PowerManager {
         // Clear callbacks to break retain cycles
         onShouldPausePlayback = nil
         onShouldResumePlayback = nil
+        onPowerConditionChanged = nil
     }
 
     // MARK: - Setup
@@ -523,6 +526,8 @@ class PowerManager {
     }
 
     private func notifyPauseIfNeeded() {
+        let conditionChanged = onPowerConditionChanged
+        runOnMain { conditionChanged?(true, false) }
         if PowerPauseOwnership.shouldClaimPause(
             wallpaperIsPlaying: WallpaperManager.shared.isPlaying
         ) {
@@ -537,6 +542,10 @@ class PowerManager {
     ///   is about battery and fullscreen pauses; applying it to a screen lock
     ///   would leave the wallpaper dead after every unlock.
     private func notifyResumeIfNeeded(respectAutoResume: Bool = true) {
+        let conditionChanged = onPowerConditionChanged
+        let paused = shouldBePaused
+        let mayResume = !respectAutoResume || WallpaperManager.shared.shouldAutoResume
+        runOnMain { conditionChanged?(paused, mayResume) }
         guard PowerPauseOwnership.shouldResume(
             pausedByPower: pausedByPower,
             shouldBePaused: shouldBePaused,

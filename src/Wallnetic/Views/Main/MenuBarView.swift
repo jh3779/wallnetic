@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MenuBarView: View {
+    @ObservedObject private var webEngine = WebWallpaperEngine.shared
     @EnvironmentObject var wallpaperManager: WallpaperManager
     @Environment(\.openWindow) var openWindow
 
@@ -32,7 +33,13 @@ struct MenuBarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Current wallpaper info
-            if let current = wallpaperManager.currentWallpaper {
+            if let web = webEngine.source {
+                Label(web.title, systemImage: "globe")
+                    .lineLimit(1)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                Divider()
+            } else if let current = wallpaperManager.currentWallpaper {
                 HStack {
                     Image(systemName: "photo.fill")
                         .foregroundColor(.secondary)

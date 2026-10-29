@@ -29,6 +29,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Setup power manager with callbacks
         setupPowerManager()
 
+        WebWallpaperEngine.shared.onActivate = { [weak self] in
+            PlaylistManager.shared.stop()
+            TimeOfDayManager.shared.stop()
+            WeatherWallpaperManager.shared.stop()
+            SpaceWallpaperManager.shared.stop()
+            self?.desktopWindowController?.cleanup()
+            self?.desktopWindowController = nil
+            WallpaperManager.shared.currentWallpaper = nil
+        }
+        WebWallpaperEngine.shared.onPlaybackChange = { playing in
+            WallpaperManager.shared.isPlaying = playing
+            WidgetSyncService.shared.syncPlaybackState(isPlaying: playing)
+        }
+        WebWallpaperEngine.shared.setPowerPaused(PowerManager.shared.shouldBePaused)
+        WebWallpaperEngine.shared.restoreIfEnabled()
+
         // Setup display change observer
         setupDisplayObserver()
 
@@ -166,6 +182,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         powerManager?.cleanup()
         desktopWindowController?.cleanup()
+        WebWallpaperEngine.shared.shutdown()
 
         logger.info("Wallnetic terminating")
     }
@@ -228,6 +245,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupPowerManager() {
         powerManager = PowerManager.shared
+        powerManager?.onPowerConditionChanged = { paused, mayResume in
+            WebWallpaperEngine.shared.updatePowerCondition(paused: paused, mayResume: mayResume)
+        }
 
         // Keep the widget in step with these pauses. It used to be harmless to
         // skip — power pauses were rare — but screen-lock pausing makes this
@@ -241,9 +261,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         powerManager?.onShouldResumePlayback = { [weak self] in
-            self?.desktopWindowController?.play()
+            if WebWallpaperEngine.shared.source == nil { self?.desktopWindowController?.play() }
             DispatchQueue.main.async {
-                WallpaperManager.shared.isPlaying = true
+                WallpaperManager.shared.isPlaying = WebWallpaperEngine.shared.source == nil || WebWallpaperEngine.shared.isRunning
                 WidgetSyncService.shared.syncPlaybackState(isPlaying: WallpaperManager.shared.isPlaying)
             }
         }
@@ -263,6 +283,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func displaysChanged() {
         Log.app.debug("Display configuration changed")
         desktopWindowController?.handleDisplayChange()
+        WebWallpaperEngine.shared.displayConfigurationChanged()
     }
 }
 
@@ -270,6 +291,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate: PlaybackDelegate {
     func playbackSetWallpaper(url: URL) {
+        WebWallpaperEngine.shared.stop()
+        if desktopWindowController == nil { desktopWindowController = DesktopWindowController() }
         Log.app.debug("PlaybackDelegate: setWallpaper \(url.lastPathComponent, privacy: .public)")
         desktopWindowController?.setWallpaper(url: url)
         if !(powerManager?.shouldBePaused ?? false) {
@@ -278,6 +301,8 @@ extension AppDelegate: PlaybackDelegate {
     }
 
     func playbackSetWallpaper(url: URL, for screen: NSScreen) {
+        WebWallpaperEngine.shared.stop()
+        if desktopWindowController == nil { desktopWindowController = DesktopWindowController() }
         Log.app.debug("PlaybackDelegate: setWallpaper for \(screen.localizedName, privacy: .public)")
         desktopWindowController?.setWallpaper(url: url, for: screen)
         if !(powerManager?.shouldBePaused ?? false) {
@@ -291,15 +316,21 @@ extension AppDelegate: PlaybackDelegate {
             Log.app.info("Play request swallowed — a power condition is active")
             return false
         }
+        if WebWallpaperEngine.shared.source != nil {
+            WebWallpaperEngine.shared.setPaused(false)
+            return WebWallpaperEngine.shared.isRunning
+        }
         desktopWindowController?.play()
         return true
     }
 
     func playbackPause() {
+        if WebWallpaperEngine.shared.source != nil { WebWallpaperEngine.shared.setPaused(true) }
         desktopWindowController?.pause()
     }
 
     func playbackApplyScreenWallpapers() {
+        guard WebWallpaperEngine.shared.source == nil else { return }
         Log.app.debug("PlaybackDelegate: applyScreenWallpapers")
         for screen in NSScreen.screens {
             if let wallpaper = WallpaperManager.shared.wallpaper(for: screen) {

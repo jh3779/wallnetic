@@ -215,6 +215,7 @@ class WallpaperManager: ObservableObject {
     }
 
     private func restoreLastWallpaper() {
+        guard WebWallpaperEngine.shared.source == nil else { return }
         guard !lastWallpaperURL.isEmpty else { return }
         let url = URL(fileURLWithPath: lastWallpaperURL)
         if let wallpaper = wallpapers.first(where: { $0.url.path == url.path }) {
@@ -280,13 +281,22 @@ class WallpaperManager: ObservableObject {
                 from: sourceURL,
                 existingWallpapers: existingWallpapers
             )
-            let wp = Wallpaper(url: destURL)
-            await MainActor.run {
-                self.wallpapers.append(wp)
+            return await MainActor.run {
+                self.registerImportedWallpaper(Wallpaper(url: destURL))
             }
-            return wp
         }
         postImportProcess(wallpaper)
+        return wallpaper
+    }
+
+    /// The directory watcher can publish a copied file before import resumes on main.
+    /// Reuse that record so the grid and thumbnail work share one stable identity.
+    @MainActor
+    func registerImportedWallpaper(_ wallpaper: Wallpaper) -> Wallpaper {
+        if let existing = wallpapers.first(where: { $0.url.standardizedFileURL == wallpaper.url.standardizedFileURL }) {
+            return existing
+        }
+        wallpapers.append(wallpaper)
         return wallpaper
     }
 

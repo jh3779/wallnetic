@@ -53,6 +53,8 @@ struct ContentView: View {
                 }
 
                 switch selectedTab {
+                case .web:
+                    WebWallpapersView()
                 case .discover:
                     DiscoverView()
                 default:
